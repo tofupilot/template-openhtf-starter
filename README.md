@@ -2,16 +2,20 @@
 
 ![Cover](cover.png)
 
-Minimal OpenHTF procedure with a single measurement phase. Mirrors the canonical [openhtf hello_world example](https://github.com/google/openhtf/blob/master/examples/hello_world.py).
+Simplest procedure showing basic structure.
 
 ## What's Inside
 
 - `hello_world.py`: OpenHTF test entry point
 - `pyproject.toml`: Python dependencies (openhtf)
 
-## Use This Template
+## Get Started
 
-Clone it from the **New Procedure** flow in TofuPilot. TofuPilot creates the repository in your account, links a procedure, builds the first deployment, and pushes it to a station.
+1. Sign up for a free TofuPilot account at [tofupilot.app](https://www.tofupilot.app/auth/signup).
+2. Open the **New Procedure** flow in the dashboard and clone this template.
+3. Follow the dashboard's instructions to set up a station and run the procedure.
+
+For deeper guides, see the [TofuPilot docs](https://www.tofupilot.com/docs/framework).
 
 ## Structure
 
@@ -21,7 +25,3 @@ Clone it from the **New Procedure** flow in TofuPilot. TofuPilot creates the rep
 ├── pyproject.toml
 └── README.md
 ```
-
-## Next Steps
-
-See the [TofuPilot guides](https://www.tofupilot.com/guides) for more templates.
