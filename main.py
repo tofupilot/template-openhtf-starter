@@ -2,7 +2,7 @@
 
 Run with (your virtualenv must be activated first):
 
-python hello_world.py
+python main.py
 
 Afterwards, take a look at the hello_world.json output file. This will
 give you a basic idea of what a minimal test outputs.
