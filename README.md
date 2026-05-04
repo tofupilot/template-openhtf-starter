@@ -6,7 +6,7 @@ Simplest procedure showing basic structure.
 
 ## What's Inside
 
-- `main.py`: OpenHTF test entry point
+- `procedure.py`: OpenHTF test entry point
 - `pyproject.toml`: Python dependencies (openhtf)
 
 ## Get Started
@@ -21,7 +21,7 @@ For deeper guides, see the [TofuPilot docs](https://www.tofupilot.com/docs/frame
 
 ```
 .
-├── main.py
+├── procedure.py
 ├── pyproject.toml
 └── README.md
 ```
