@@ -9,12 +9,13 @@ Showcases the core features in a single test:
   - Attachments
 
 When deployed via TofuPilot, runs are captured automatically — no
-output callback or station server is needed.
+output callback or station server is needed. The TofuPilot dashboard
+prompts the operator for the serial number and renders native
+`user_input.prompt(...)` calls in the browser.
 """
 
 import csv
 import io
-from time import sleep
 
 import openhtf as htf
 from openhtf.plugs import BasePlug, user_input
@@ -27,7 +28,6 @@ class DutPlug(BasePlug):
         self._powered = False
 
     def power_on(self):
-        sleep(0.1)
         self._powered = True
 
     def read_voltage(self) -> float:
@@ -52,7 +52,7 @@ def confirm_led_on(test, prompt):
 
 @htf.measures(
     htf.Measurement("led_color").with_validator(
-        lambda c: c.lower() in ("red", "green", "blue")
+        lambda c: str(c).lower() in ("red", "green", "blue")
     )
 )
 @htf.plug(prompt=user_input.UserInput)
@@ -84,7 +84,7 @@ def create_and_run_test():
         measure_voltage,
         procedure_id="FVT1",
     )
-    test.execute(test_start=user_input.prompt_for_test_start())
+    test.execute()
 
 
 if __name__ == "__main__":
