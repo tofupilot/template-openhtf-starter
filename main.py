@@ -1,23 +1,9 @@
-"""OpenHTF starter procedure for TofuPilot.
-
-Showcases the most-used features in a single test:
-  - Plug with shared state across phases
-  - Logger output
-  - Operator prompts (button + text input)
-  - Numeric measurement with hard + marginal limits
-  - String measurement with custom validator
-  - Multi-dimensional measurement (voltage vs time -> chart in TofuPilot)
-  - File attachment (CSV)
-  - PhaseResult flow control (skip)
-
-When deployed via TofuPilot, runs are captured automatically -- no
-output callback or station server needed. The TofuPilot dashboard owns
-the serial-number prompt and renders native `user_input.prompt(...)`
-calls in the browser.
-"""
+"""OpenHTF starter procedure for TofuPilot."""
 
 import csv
 import io
+import math
+import random
 import time
 
 import openhtf as htf
@@ -37,9 +23,11 @@ class DutPlug(BasePlug):
         self._powered = True
 
     def read_voltage(self) -> float:
-        # Tiny ripple so the multi-dim chart isn't a flat line.
-        ripple = 0.005 * ((time.time_ns() % 7) - 3)
-        return 5.01 + ripple if self._powered else 0.0
+        if not self._powered:
+            return 0.0
+        ripple = 0.03 * math.sin(2 * math.pi * 5.0 * time.time())
+        noise = random.gauss(0.0, 0.005)
+        return 5.01 + ripple + noise
 
     def tearDown(self):
         self._powered = False
@@ -54,9 +42,9 @@ def power_on(test, dut):
 
 @htf.plug(prompt=user_input.UserInput)
 def confirm_led_on(test, prompt):
-    """Operator confirms the LED is lit. Returns SKIP if the operator types `skip`."""
+    """Operator confirms the LED is lit; type `skip` to skip the rest of the test."""
     response = prompt.prompt(
-        message="Is the LED on? Click OK to continue, or type `skip` to skip the rest of the test.",
+        message="Is the LED on? Click OK to continue, or type `skip` to skip.",
         text_input=True,
     )
     if (response or "").strip().lower() == "skip":
@@ -69,12 +57,12 @@ def confirm_led_on(test, prompt):
 )
 @htf.plug(prompt=user_input.UserInput)
 def check_led_color(test, prompt):
-    """Operator types the LED color (red, green, or blue)."""
-    color = prompt.prompt(message="Enter the LED color:", text_input=True)
-    test.measurements.led_color = color
+    """Operator types the LED color."""
+    test.measurements.led_color = prompt.prompt(
+        message="Enter the LED color:", text_input=True,
+    )
 
 
-# Hard limits 4.8..5.2; marginal limits 4.95..5.05 (warn but still pass).
 @htf.measures(
     htf.Measurement("supply_voltage")
     .in_range(4.8, 5.2, marginal_minimum=4.95, marginal_maximum=5.05)
@@ -86,9 +74,6 @@ def measure_voltage(test, dut):
     test.measurements.supply_voltage = dut.read_voltage()
 
 
-# Multi-dim measurement: voltage vs time. TofuPilot plots this as a chart
-# in the dashboard automatically. Use an explicit Dimension(description=...)
-# so the X axis shows "Time" instead of OpenHTF's verbose unit name.
 @htf.measures(
     htf.Measurement("voltage_vs_time")
     .with_dimensions(Dimension(description="Time", unit=units.SECOND))
@@ -96,16 +81,16 @@ def measure_voltage(test, dut):
 )
 @htf.plug(dut=DutPlug)
 def sweep_voltage(test, dut):
-    """Sample voltage over a few seconds and stream it to TofuPilot."""
+    """Sample voltage over one second and stream the curve to TofuPilot."""
     samples = []
-    for i in range(20):
-        t = i * 0.1
+    start = time.time()
+    for _ in range(50):
+        t = time.time() - start
         v = dut.read_voltage()
         test.measurements.voltage_vs_time[t] = v
         samples.append((t, v))
         time.sleep(0.02)
 
-    # Same data attached as raw CSV for users who want the file too.
     buf = io.StringIO()
     writer = csv.writer(buf)
     writer.writerow(["t_s", "voltage_v"])
@@ -113,7 +98,7 @@ def sweep_voltage(test, dut):
     test.attach("voltage_sweep.csv", buf.getvalue().encode(), mimetype="text/csv")
 
 
-def create_and_run_test():
+def main():
     test = htf.Test(
         power_on,
         confirm_led_on,
@@ -126,4 +111,4 @@ def create_and_run_test():
 
 
 if __name__ == "__main__":
-    create_and_run_test()
+    main()
