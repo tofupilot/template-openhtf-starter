@@ -11,7 +11,7 @@ A single OpenHTF procedure that showcases the core features you'll use in produc
 | Plug (shared instrument with state across phases) | `DutPlug`, used by `power_on`, `measure_voltage`, `sweep_voltage` |
 | Logger output | `test.logger.info(...)` in `power_on` |
 | Operator prompt with text input + skip flow | `confirm_led_on` |
-| String measurement with custom validator (lambda) | `check_led_color` |
+| String measurement with regex validator | `check_led_color` (`matches_regex(r"(?i)^(red\|green\|blue)$")`) |
 | Numeric measurement with hard + marginal limits | `measure_voltage` (`in_range(4.8, 5.2, marginal_minimum=4.95, marginal_maximum=5.05)`) |
 | Multi-dimensional measurement (chart in TofuPilot) | `sweep_voltage` (`voltage_vs_time` dimensioned by seconds) |
 | File attachment | `sweep_voltage` attaches `voltage_sweep.csv` |

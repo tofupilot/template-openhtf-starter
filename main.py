@@ -64,9 +64,7 @@ def confirm_led_on(test, prompt):
 
 
 @htf.measures(
-    htf.Measurement("led_color").with_validator(
-        lambda c: str(c).lower() in ("red", "green", "blue")
-    )
+    htf.Measurement("led_color").matches_regex(r"(?i)^(red|green|blue)$")
 )
 @htf.plug(prompt=user_input.UserInput)
 def check_led_color(test, prompt):
