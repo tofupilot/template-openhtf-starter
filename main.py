@@ -22,6 +22,7 @@ import time
 
 import openhtf as htf
 from openhtf import PhaseResult
+from openhtf.core.measurements import Dimension
 from openhtf.plugs import BasePlug, user_input
 from openhtf.util import units
 
@@ -86,10 +87,11 @@ def measure_voltage(test, dut):
 
 
 # Multi-dim measurement: voltage vs time. TofuPilot plots this as a chart
-# in the dashboard automatically.
+# in the dashboard automatically. Use an explicit Dimension(description=...)
+# so the X axis shows "Time" instead of OpenHTF's verbose unit name.
 @htf.measures(
     htf.Measurement("voltage_vs_time")
-    .with_dimensions(units.SECOND)
+    .with_dimensions(Dimension(description="Time", unit=units.SECOND))
     .with_units("V")
 )
 @htf.plug(dut=DutPlug)
